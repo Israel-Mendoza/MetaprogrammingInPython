@@ -1,17 +1,27 @@
-"""Working with __new__ and __init__ to create instances"""
+"""Working with __new__ and __init__ to create class instances"""
 
 from typing import Union
 
 # When calling the class, Python will call the __new__ method
 # on the class, and will pass the class as the first argument.
+# Then, __init__ will be called on the recently created instance.
+# If we want these two methods to work we must make sure that:
+#   1. __new__ returns an instance of the class
+#   2. __new__ and __init__ must accept the same number of arguments.
 
 
 class Point:
     def __new__(cls, x: Union[int, float], y: Union[int, float]) -> "Point":
-        """When called, cls will be set as the calling class itself."""
+        """
+        When Point.__new__ is called,
+        cls will be set as the calling class itself.
+        Returns an instance of Point.
+        """
         print("__new__ called! Creating instance...")
-        # Creating a Point instance:
+        # Creating a Point instance.
+        # object.__new__() accepts only the class to be instantiated.
         point_instance = super().__new__(cls)
+        # Returning the created instance
         return point_instance
 
     def __init__(self, x: Union[int, float], y: Union[int, float]) -> None:
@@ -42,12 +52,17 @@ class Squared(int):
         return new_instance
 
 
-my_num = Squared.__new__(Squared, 4)
-print(my_num)
-# 16
+my_num1 = Squared.__new__(Squared, 4)
+my_num2 = Squared(4)
+print(my_num1)  # 16
+print(my_num2)  # 16
+
+print(type(my_num1))  # <class '__main__.Squared'>
+print(isinstance(my_num1, Squared))  # True
+print(isinstance(my_num1, int))  # True
 
 
-"""Argument list must match betweem __new__ and __init__"""
+"""Argument list must match between __new__ and __init__"""
 
 
 class Person:
@@ -92,7 +107,7 @@ s1 = Student("Israel", "Music")
 
 
 """
-We must make sure we use super().__new__ and not object.__new__
+We must make sure we use super().__new__() and not object.__new__()
 when overriding __new__, because we might miss additional tweakings
 from the parent class!
 """
