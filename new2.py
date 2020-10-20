@@ -42,7 +42,7 @@ class Squared(int):
         return new_instance
 
 
-my_num = Squared(4)
+my_num = Squared.__new__(Squared, 4)
 print(my_num)
 # 16
 
