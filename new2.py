@@ -110,6 +110,14 @@ s1 = Student("Israel", "Music")
 We must make sure we use super().__new__() and not object.__new__()
 when overriding __new__, because we might miss additional tweakings
 from the parent class!
+Warning! We must pay attention to the parameters the super().__new__ 
+method required. 
+
+i.e. object.__new__() will only required the class. If other arguments 
+are passed, we will have a TypeError:
+
+TypeError: object.__new__() takes exactly one argument (the type to instantiate)
+
 """
 
 
