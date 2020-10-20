@@ -6,15 +6,18 @@ Why not use __new__ to initialize the instance all the time then?
 from typing import Union
 
 # Sometimes, we may actually want to tweak some of the instantiation process.
-# We could definitely use the __new__ method to initialize the instance
-# without having to use the __init__ method, but then we would have to take
-# care of the instance creation all the time.
+# Also, we can definitely use the __new__ method to initialize the instance
+# without having to use the __init__ method.
+# The only drawback is that, by using __new__ method to instantiate AND initialize
+# the instance, we would have to take care of the instance creation all the time.
+
 
 """Tweaking the class before creating an instance"""
 
 
 class Square:
     def __new__(cls, width: Union[int, float], height: Union[int, float]) -> "Square":
+        """Tweaking class before instantiating """
         print("__new__ called!")
         # Adding a method to the class.
         # Note: Everytime a new instance is created, a new  lambda is also created,
@@ -62,9 +65,9 @@ class Square:
 s2 = Square(10, 20)
 # __new__ called!
 # __init__ was called, but doesn't do much!
-print(s2.__dict__)  # {'width': 10, 'height': 10}
+print(s2.__dict__)  # {'width': 10, 'height': 10} (Populated by __new__)
 
 # Notice again how __init__ is not called!
 s3 = Square.__new__(Square, 10, 30)
 # __new__ called!
-print(s3.__dict__)  # {'width': 10, 'height': 10}
+print(s3.__dict__)  # {'width': 10, 'height': 10} (Populated by __new__)
