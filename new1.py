@@ -1,31 +1,37 @@
 """Introducing the __new__ method"""
 
-# When instantiating an instance of a class, Python calls the __new__ method
-# on the class and passes the class as the first parameter:
-# my_obj = MyClass.__new__(MyClass)
-# If this method is not defined by the class, it will take it from the
-# parent class, as expected. In this case, it will be from "object":
-
 from typing import Union
+
+# When creating an instance of a class, the __new__ static method
+# of the class is caled and passes the class itself as the first parameter:
+#
+# my_obj = MyClass.__new__(MyClass)
+#
+# If this method is not defined in the class, it will call it from the
+# parent class, as expected.
 
 
 class Point:
+    # Defining __init__ only
     def __init__(self, x: Union[int, float], y: Union[int, float]) -> None:
         print(f"__init__ was called - self: {self}")
         self.x = x
         self.y = y
 
 
-# __new__ creates the instance and returns it.
-# Then __init__ is called passing the recently created instance
-# returned by the __new__ method as the first argument
+# When the class is called to create an instance, __new__ is called to
+# create it and return it without us noticing.
+# Then __init__ is then called automatically after __new__,
+# passing the recently created instance returned by the __new__ method
+# as the first argument.
 p1 = Point(10, 20)
 # __init__ was called - self: <__main__.Point object at 0x27C57B43FD0>
 
-# Only __new__ is called
-p2 = Point.__new__(Point)
-# Only __new__ is called
-p3 = object.__new__(Point)
+
+"""If we don't want to have __init__ called, we must call __new__ directly:"""
+
+p2 = Point.__new__(Point)  # (No output)
+p3 = object.__new__(Point)  # (No output)
 
 print(type(p1))  # <class '__main__.Point'>
 print(type(p2))  # <class '__main__.Point'>
