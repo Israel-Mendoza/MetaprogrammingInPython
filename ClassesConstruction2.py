@@ -19,7 +19,7 @@ from math import pi
 ###################################################
 
 
-# First, let's learn how to run code agains a given namespace dictionary:
+# First, let's learn how to run code against a given namespace dictionary:
 # exec() takes code (str or bytes), and executes it in
 # a given namespace, filling out the namespace dictionary.
 
@@ -27,7 +27,7 @@ from math import pi
 namespace1 = {}
 namespace2 = {}
 
-# Executing code into the namespace2 dictionary
+# Executing code into the namespace1 dictionary
 exec(
     """
 a = 10
@@ -78,11 +78,18 @@ print("sub" in globals())  # False
 
 #####################################################################
 # Creating the class body code to manually insert it to a namespace #
-# We will use type(name, bases, namespace) to create the new type   #
+# We will use type(name, bases, namespace) to create the new type:  #
+#   name (str) = The name of the class                              #
+#   bases (tuple[type]) = The classes our class inherits from       #
+#   namespace (dict[str, Any])  = The symbols and their objects     #
 #####################################################################
 
 
+"""Creating the contents of our new class"""
+
 class_name = "Circle"
+class_bases = ()  # object will be inferred
+class_namespace = {}  # namespace to be populated
 class_body = """
 def __init__(self, radius: Union[int, float]) -> None:
         self.radius = radius
@@ -90,9 +97,6 @@ def __init__(self, radius: Union[int, float]) -> None:
 def area(self):
     return pi * self.radius ** 2
 """
-class_bases = ()  # object will be inferred
-class_namespace = {}
-
 # Populating the new class namespace
 exec(class_body, globals(), class_namespace)
 # Confirming the namespace is populated now
@@ -102,7 +106,8 @@ print(class_namespace)
 # 'area': <function area at 0x249F3723820>
 # }
 
-# CREATING OUR OWN CLASS USING THE TYPE CLASS
+"""CREATING OUR OWN CLASS USING THE TYPE CLASS"""
+
 Circle = type(class_name, class_bases, class_namespace)
 
 # Circle is a type:
@@ -142,7 +147,8 @@ print(Circle.__dict__)
 # Class name was taken as the first parameter in type()
 print(Circle.__name__)  # Circle
 
-# Creating instances from class
+"""Creating a Circle instance"""
+
 c1 = Circle(10)
 print(type(c1))  # <class '__main__.Circle'>
 print(c1.__dict__)  # {'radius': 10}
