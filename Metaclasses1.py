@@ -4,6 +4,7 @@
 # This class will be in charge of creating classes using the
 # super().__new__() method.
 # By doing this, we can customize how a class is created.
+# This will be our first example of a metaclass.
 
 
 from typing import Type
@@ -34,6 +35,7 @@ class CustomType(type):
 
 # Preparing the arguments
 class_name = "Person"
+class_bases = tuple()
 class_body = """
 def __init__(self, name):
     print("__init__ called!")
@@ -42,8 +44,8 @@ def __init__(self, name):
 def __str__(self):
     return f"Person called {self.name}"
 """
-class_bases = tuple()
-exec(class_body, globals(), class_namespace := {})
+class_namespace = {}
+exec(class_body, globals(), class_namespace)
 
 # Using our CustomType class to create another class
 Person = CustomType(class_name, class_bases, class_namespace)
