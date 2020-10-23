@@ -1,4 +1,4 @@
-"""Caveats of using class decorators to decorate callables on static and class methods"""
+"""Caveats of using class decorators to decorate static and class methods"""
 
 
 from functools import wraps
@@ -59,7 +59,7 @@ p1.class_method()
 # Person says hello!
 
 # Why weren't the class method and the static method decorated?
-# Because these descriptors are not callable! They are descriptors
+# Because these descriptors are not callable! They are descriptors.
 # They execute the __get__ method when accessed, but not the __call__ method
 
 print(type(Person.__dict__["static_method"]))  # <class 'staticmethod'>
