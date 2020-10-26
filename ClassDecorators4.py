@@ -2,7 +2,7 @@
 
 
 from functools import wraps
-from typing import Callable, Type
+from typing import Any, Callable, Type
 
 
 # Simple logger function to decorate functions
@@ -19,35 +19,32 @@ def function_logger(fn: Callable) -> Callable:
 
 # Class decorator that will decorate callables, properties, class and static
 # methods in the decorated class using the function_logger decorator.
-def logger_to_class_callables(cls: Type) -> Type:
-    for attr_name, attr_value in vars(cls).items():
-        if callable(attr_value):
-            print(f"Decorating {cls.__name__}.{attr_name} with function_logger")
-            setattr(cls, attr_name, function_logger(attr_value))
-        elif isinstance(attr_value, staticmethod):
-            print(f"Decorating {cls.__name__}.{attr_name} with function_logger")
-            temp = staticmethod(function_logger(attr_value.__func__))
-            setattr(cls, attr_name, temp)
-        elif isinstance(attr_value, classmethod):
-            print(f"Decorating {cls.__name__}.{attr_name} with function_logger")
-            temp = classmethod(function_logger(attr_value.__func__))
-            setattr(cls, attr_name, temp)
-        elif isinstance(attr_value, property):
-            name = cls.__name__
-            if attr_value.fget:
-                print(f"Decorating {name}.{attr_name} getter with function_logger")
-                attr_value = attr_value.getter(function_logger(attr_value.fget))
-            if attr_value.fset:
-                print(f"Decorating {name}.{attr_name} setter with function_logger")
-                attr_value = attr_value.setter(function_logger(attr_value.fset))
-            if attr_value.fdel:
-                print(f"Decorating {name}.{attr_name} deleter with function_logger")
-                attr_value = attr_value.deleter(function_logger(attr_value.fdel))
-            setattr(cls, attr_name, attr_value)
-    return cls
+def class_decorator(wrapper_function: Callable[..., Any]) -> Callable[[Type], Type]:
+    def _func_decorator(cls: Type) -> Type:
+        for name, value in vars(cls).items():
+            if callable(value):
+                setattr(cls, name, wrapper_function(value))
+            elif isinstance(value, classmethod):
+                new_method = classmethod(wrapper_function(value.__func__))
+                setattr(cls, name, new_method)
+            elif isinstance(value, staticmethod):
+                new_method = staticmethod(wrapper_function(value.__func__))
+                setattr(cls, name, new_method)
+            elif isinstance(value, property):
+                if value.fget:
+                    value = value.getter(wrapper_function(value.fget))
+                if value.fset:
+                    value = value.setter(wrapper_function(value.fset))
+                if value.fdel:
+                    value = value.deleter(wrapper_function(value.deleter))
+                setattr(cls, name, value)
+
+        return cls
+
+    return _func_decorator
 
 
-@logger_to_class_callables
+@class_decorator(function_logger)
 class Person:
     def __init__(self, name: str) -> None:
         self._name = name
