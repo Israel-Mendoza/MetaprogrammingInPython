@@ -2,12 +2,15 @@
 
 
 from functools import wraps
-from typing import Callable, Type
+from typing import Any, Callable, TypeVar
+
+T = TypeVar("T")
+AnyCallable = Callable[..., Any]
 
 
-def function_logger(fn: Callable) -> Callable:
+def function_logger(fn: AnyCallable) -> AnyCallable:
     @wraps(fn)
-    def inner(*args, **kwargs):
+    def inner(*args: Any, **kwargs: Any) -> Any:
         result = fn(*args, **kwargs)
         print(f"\nFunction called: {fn.__qualname__}({args}, {kwargs})")
         print(f"Returned value: {result}\n")
@@ -16,7 +19,7 @@ def function_logger(fn: Callable) -> Callable:
     return inner
 
 
-def logger_to_class_callables(cls: Type) -> Type:
+def logger_to_class_callables(cls: T) -> T:
     for attr_name, attr_value in vars(cls).items():
         if callable(attr_value):
             print(f"Decorating {cls.__name__}.{attr_name} with function_logger")
@@ -26,20 +29,20 @@ def logger_to_class_callables(cls: Type) -> Type:
 
 
 @logger_to_class_callables
-class Person:
+class Person1:
     def __init__(self, name: str, age: int) -> None:
         self.name = name
         self.age = age
 
-    def instance_method(self):
+    def instance_method(self) -> None:
         print(f"{self} instance says hello!")
 
     @staticmethod
-    def static_method():
+    def static_method() -> None:
         print(f"Hello from the static method")
 
     @classmethod
-    def class_method(cls):
+    def class_method(cls) -> None:
         print(f"{cls.__name__} says hello!")
 
 
@@ -48,9 +51,9 @@ class Person:
 # Decorating Person.instance_method with function_logger
 
 
-p1 = Person("Israel", 28)
+p1 = Person1("Israel", 28)
 # Output:
-# Function called: Person.__init__((<__main__.Person object at 0x0000027CC63A36A0>, 'Israel', 28), {})
+# Function called: Person1.__init__((<__main__.Person object at 0x0000027CC63A36A0>, 'Israel', 28), {})
 # Returned value: None
 
 p1.static_method()
@@ -62,10 +65,10 @@ p1.class_method()
 # Because these descriptors are not callable! They are descriptors.
 # They execute the __get__ method when accessed, but not the __call__ method
 
-print(type(Person.__dict__["static_method"]))  # <class 'staticmethod'>
-print(type(Person.__dict__["class_method"]))  # <class 'classmethod'>
-print(callable(Person.__dict__["static_method"]))  # False
-print(callable(Person.__dict__["class_method"]))  # False
+print(type(Person1.__dict__["static_method"]))  # <class 'staticmethod'>
+print(type(Person1.__dict__["class_method"]))  # <class 'classmethod'>
+print(callable(Person1.__dict__["static_method"]))  # False
+print(callable(Person1.__dict__["class_method"]))  # False
 
 
 """Decorating static and class methods"""

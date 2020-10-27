@@ -2,13 +2,15 @@
 
 
 from functools import wraps
-from typing import Any, Callable, Type
+from typing import Any, Callable, TypeVar
 
+T = TypeVar("T")
+AnyCallable = Callable[..., Any]
 
 # Simple logger function to decorate functions
-def function_logger(fn: Callable) -> Callable:
+def function_logger(fn: AnyCallable) -> AnyCallable:
     @wraps(fn)
-    def inner(*args, **kwargs):
+    def inner(*args: Any, **kwargs: Any) -> Any:
         result = fn(*args, **kwargs)
         print(f"\nFunction called: {fn.__qualname__}({args}, {kwargs})")
         print(f"Returned value: {result}\n")
@@ -19,8 +21,8 @@ def function_logger(fn: Callable) -> Callable:
 
 # Class decorator that will decorate callables, properties, class and static
 # methods in the decorated class using the function_logger decorator.
-def class_decorator(wrapper_function: Callable[..., Any]) -> Callable[[Type], Type]:
-    def _func_decorator(cls: Type) -> Type:
+def class_decorator(wrapper_function: AnyCallable) -> Callable[[T], T]:
+    def _func_decorator(cls: T) -> T:
         for name, value in vars(cls).items():
             if callable(value):
                 setattr(cls, name, wrapper_function(value))
@@ -50,22 +52,22 @@ class Person:
         self._name = name
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     @name.setter
-    def name(self, value):
+    def name(self, value: str) -> None:
         self._name = value
 
-    def instance_method(self):
+    def instance_method(self) -> None:
         print(f"{self} instance says hello!")
 
     @staticmethod
-    def static_method():
+    def static_method() -> None:
         print(f"Hello from the static method")
 
     @classmethod
-    def class_method(cls):
+    def class_method(cls) -> None:
         print(f"{cls.__name__} says hello!")
 
 

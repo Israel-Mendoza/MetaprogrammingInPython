@@ -4,15 +4,17 @@
 # Creating a couple of class decorators
 
 
-from typing import Callable, Type
+from typing import Callable, TypeVar
+
+T = TypeVar("T")
 
 
-def savings(cls):
+def savings(cls: T) -> T:
     cls.account_type = "savings"
     return cls
 
 
-def checking(cls):
+def checking(cls: T) -> T:
     cls.account_type = "checking"
     return cls
 
@@ -25,34 +27,34 @@ class Account:
 
 
 @savings
-class BankSavings1(Account):
+class BankSavings01(Account):
     pass
 
 
 @savings
-class BankSavings2(Account):
+class BankSavings02(Account):
     pass
 
 
 @checking
-class BankChecking1(Account):
+class BankChecking01(Account):
     pass
 
 
 @checking
-class BankChecking2(Account):
+class BankChecking02(Account):
     pass
 
 
 # "account_type" was injected by the decorators
 
-print(vars(BankSavings1))
+print(vars(BankSavings01))
 # {'__module__': '__main__', '__doc__': None, 'account_type': 'savings'}
-print(vars(BankSavings2))
+print(vars(BankSavings02))
 # {'__module__': '__main__', '__doc__': None, 'account_type': 'savings'}
-print(vars(BankChecking1))
+print(vars(BankChecking01))
 # {'__module__': '__main__', '__doc__': None, 'account_type': 'checking'}
-print(vars(BankChecking2))
+print(vars(BankChecking02))
 # {'__module__': '__main__', '__doc__': None, 'account_type': 'checking'}
 
 
@@ -61,10 +63,10 @@ print(vars(BankChecking2))
 # Creating a parameterized class decorator
 
 
-def account_type(acc_type: str) -> Callable[[Type], Type]:
+def account_type(acc_type: str) -> Callable[[T], T]:
     """Decorator factory"""
 
-    def class_decorator(cls: Type):
+    def class_decorator(cls: T) -> T:
         """A class decorator"""
         cls.account_type = acc_type
         return cls
@@ -108,7 +110,7 @@ print(vars(BankChecking2))
 """Using class decorator to add a function to the decorated class"""
 
 
-def adding_greeting(cls):
+def adding_greeting(cls: T) -> T:
     cls.say_hello = lambda self: f"{self} says hello!"
     return cls
 
@@ -119,7 +121,7 @@ class Person:
         self.name = name
         self.age = age
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 

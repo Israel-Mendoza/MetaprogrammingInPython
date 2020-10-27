@@ -2,16 +2,18 @@
 
 
 from functools import wraps
-from typing import Callable, Type
+from typing import Any, Callable, TypeVar
 
+T = TypeVar("T")
+AnyCallable = Callable[..., Any]
 
 """Decorating methods in a class one by one... Argh..."""
 
 
 # Creating a simple function logger decorator
-def function_logger(fn: Callable) -> Callable:
+def function_logger(fn: Callable[..., Any]) -> Callable[..., Any]:
     @wraps(fn)
-    def inner(*args, **kwargs):
+    def inner(*args: Any, **kwargs: Any) -> Any:
         result = fn(*args, **kwargs)
         print(f"\nFunction called: {fn.__qualname__}({args}, {kwargs})")
         print(f"Returned value: {result}\n")
@@ -20,7 +22,7 @@ def function_logger(fn: Callable) -> Callable:
     return inner
 
 
-class Person:
+class Person1:
     @function_logger
     def __init__(self, name: str, age: int) -> None:
         self.name = name
@@ -33,7 +35,7 @@ class Person:
 
 # Testing the logger.
 
-p1 = Person("Israel", 28)
+p1 = Person1("Israel", 28)
 # Function called: Person.__init__((<__main__.Person object at 0x24E30B26F70>, 'Israel', 28), {})
 # Returned value: None
 
@@ -46,7 +48,7 @@ p1.greet()
 
 
 # Creating a class decorator to decorate all class methods at once with hardcoded function
-def logger_to_class_callables(cls: Type) -> Type:
+def logger_to_class_callables(cls: T) -> T:
     for attr_name, attr_value in vars(cls).items():
         if callable(attr_value):
             print(f"Decorating {cls.__name__}.{attr_name} with function_logger")
@@ -55,7 +57,7 @@ def logger_to_class_callables(cls: Type) -> Type:
 
 
 @logger_to_class_callables
-class Person:
+class Person2:
     def __init__(self, name: str, age: int) -> None:
         self.name = name
         self.age = age
@@ -65,7 +67,7 @@ class Person:
 
 
 # Output:
-# Decorating Person.__init__ with function_logger
+# Decorating Person2.__init__ with function_logger
 # Decorating Person.greet with function_logger
 
 
@@ -76,8 +78,8 @@ being able to select the function that will serve as decorator.
 
 
 # Creating a parameterized class decorator to decorate all class methods at once
-def decorating_callables(fn: Callable[[Callable], Callable]) -> Callable[[Type], Type]:
-    def _decorating_callables(cls: Type) -> Type:
+def decorating_callables(fn: Callable[[AnyCallable], AnyCallable]) -> Callable[[T], T]:
+    def _decorating_callables(cls: T) -> T:
         for attr_name, attr_value in vars(cls).items():
             if callable(attr_value):
                 print(f"Decorating {cls.__name__}.{attr_name} with {fn.__qualname__}")
@@ -89,7 +91,7 @@ def decorating_callables(fn: Callable[[Callable], Callable]) -> Callable[[Type],
 
 
 @decorating_callables(function_logger)
-class Person:
+class Person3:
     def __init__(self, name: str, age: int) -> None:
         self.name = name
         self.age = age
@@ -99,11 +101,11 @@ class Person:
 
 
 # Output:
-# Decorating Person.__init__ with function_logger
-# Decorating Person.greet with function_logger
+# Decorating Person3.__init__ with function_logger
+# Decorating Person3.greet with function_logger
 
 
-p1 = Person("Israel", 28)
+p1 = Person3("Israel", 28)
 # Function called: Person.__init__((<__main__.Person object at 0x24E30D867C0>, 'Israel', 28), {})
 # Returned value: None
 
