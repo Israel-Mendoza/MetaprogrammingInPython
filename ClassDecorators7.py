@@ -3,7 +3,7 @@
 
 from functools import wraps
 from inspect import isroutine
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, Optional, TypeVar
 
 
 T = TypeVar("T")
@@ -73,7 +73,7 @@ class MyClass:
     def static_method():
         print(f"Hello from a static method")
 
-    def __add__(self, other):
+    def __add__(self, other: Any) -> Optional[str]:
         if isinstance(other, MyClass):
             return f"{self.name} + {other.name}"
 
