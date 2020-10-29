@@ -1,7 +1,10 @@
 """Using a class as a decorator"""
 
-from typing import Any, Callable
+from typing import Any, Callable, TypeVar, Union
 from types import MethodType
+
+
+T = TypeVar("T")
 
 
 class Logger:
@@ -12,7 +15,7 @@ class Logger:
         print(f"Calling {self.func.__name__}")
         return self.func(*args, **kwargs)
 
-    def __get__(self, instance, cls):
+    def __get__(self, instance: object, cls: T) -> Union[MethodType, "Logger"]:
         if instance:
             return MethodType(self, instance)
         return self
@@ -23,18 +26,18 @@ class Person:
         self.name = name
 
     @Logger
-    def say_hi(self):
+    def say_hi(self) -> str:
         return f"{self.name} says 'Hello World!'"
 
     @classmethod
     @Logger
-    def cls_method(cls):
-        print(f"{cls.__name__} says hello!")
+    def cls_method(cls) -> str:
+        return f"{cls.__name__} says hello!"
 
     @staticmethod
     @Logger
-    def static_method():
-        print("A static method says hello!")
+    def static_method() -> str:
+        return "A static method says hello!"
 
 
 p = Person("Israel")
@@ -42,7 +45,14 @@ p = Person("Israel")
 
 try:
     print(p.say_hi())
+except TypeError as error:
+    print(f"{type(error).__name__}: {error}")
+# Calling say_hi
+# Israel says 'Hello World!'
+
+try:
     print(Person.say_hi())
 except TypeError as error:
     print(f"{type(error).__name__}: {error}")
+# Calling say_hi
 # TypeError: say_hi() missing 1 required positional argument: 'self'

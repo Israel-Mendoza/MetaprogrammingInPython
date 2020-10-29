@@ -1,11 +1,14 @@
 """Using a class as a decorator"""
 
-from typing import Any, Callable
-from functools import wraps
+from typing import Any, Callable, Union
+
+
+AnyCallable = Callable[..., Any]
+Number = Union[int, float]
 
 
 class Logger:
-    def __init__(self, a_func: Callable[..., Any]) -> None:
+    def __init__(self, a_func: AnyCallable) -> None:
         self.func = a_func
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
@@ -14,10 +17,12 @@ class Logger:
 
 
 @Logger
-def add(a: int, b: int) -> int:
+def add(a: Number, b: Number) -> Number:
     return a + b
 
 
+print(type(add))
+# <class '__main__.Logger'>
 print(add(10, 20))
 # Calling add!!!
 # 30
@@ -31,7 +36,7 @@ class Person:
         self.name = name
 
     @Logger
-    def say_hi(self):
+    def say_hi(self) -> str:
         return f"{self.name} says 'Hello World!'"
 
 
