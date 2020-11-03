@@ -13,7 +13,6 @@ What does Python do when we declare a new class?
 from typing import Union
 from math import pi
 
-
 ###################################################
 # How to run code in a given namespace dictionary #
 ###################################################
@@ -87,6 +86,7 @@ print("sub" in globals())  # False
 
 """Creating the contents of our new class"""
 
+
 class_name = "Circle"
 class_bases = ()  # object will be inferred
 class_namespace = {}  # namespace to be populated
@@ -107,6 +107,20 @@ print(class_namespace)
 # }
 
 """CREATING OUR OWN CLASS USING THE TYPE CLASS"""
+
+
+#########################################################################
+# When creating a new class using "type", type, being a type instance,  #
+# calls its __prepare__ static method to get the initial namespace      #
+# dictionary, which will then be populated with the code of the class   #
+# before being passed to the type.__call__ method.                      #
+# The type.__call__ implements two calls:                               #
+#   1. type.__new__                                                     #
+#   2. type.__init__                                                    #
+# The type.__call__ method will then return the recently created type   #
+# returned by the type.__new__ method.                                  #
+#########################################################################
+
 
 Circle = type(class_name, class_bases, class_namespace)
 
